@@ -21,21 +21,27 @@ class StubApi extends RestController {
     {
         // パラメータを変数にセット
         $id = $this->post('id');
+        $pass = $this->post('pass');
         $sys_id = $this->post('sys_id');
+
+        $http_status = 400;
+
+        if ($pass != 'test') {
+            $http_status = 200;
+        }
 
         // 固定で返却する値
         $response_data = array(
             'results'=> array(
                 'user_info'=> array(
-                    'user_id'=> 1234,
-                    'user_name'=> 'ほげ太郎',
-                    'email'=> 'foo.bar@foo.bar.jp'
+                    'user_id'=> $id,
+                    'user_name'=> 'ほげ太郎'
                 )
             )
         );
 
         // defaultがjson形式のレスポンスとなるためxmlに変更
         $this->response->format = 'xml';
-        $this->response($response_data, 200);
+        $this->response($response_data, $http_status);
     }
 }

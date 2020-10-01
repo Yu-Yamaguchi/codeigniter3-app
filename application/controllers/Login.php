@@ -27,6 +27,8 @@ class Login extends CI_Controller {
             show_404();
         }
 
+        $this->session->sess_destroy();
+
         $data['title'] = "ログイン";
 
         $data['form']['login_id'] = '';
@@ -46,28 +48,30 @@ class Login extends CI_Controller {
     {
         $data['form'] = $this->input->post();
 
+        $login_id = $this->input->post('login_id');
+        $pass = $this->input->post('pass');
+
         $this->form_validation->set_rules('login_id', 'ログインID', 'required');
         $this->form_validation->set_rules('pass', 'パスワード', 'required');
 
-        if($this->form_validation->run()){
+        if ($this->form_validation->run()) {
             // エラーが無い場合
-            // 認証システムでログイン処理
-            $this->login_api($this->input->post('login_id'), $this->input->post('pass'));
-
-            // redirect("apply/home");
-        }else{
-            // エラーの場合
-            $data['title'] = "ログイン";
-            $this->load->view('templates/header', $data);
-            $this->load->view('pages/login', $data);
-            $this->load->view('templates/footer', $data);
+            if ($this->login_api_check($login_id, $pass)) {
+                redirect("gmo/menu"); 
+            }
         }
+
+        // エラーの場合
+        $data['title'] = "ログイン";
+        $this->load->view('templates/header', $data);
+        $this->load->view('pages/login', $data);
+        $this->load->view('templates/footer', $data);
     }
 
     /**
      * 認証システムのAPIを実行して認証処理を行います。
      */
-    private function login_api ($loginId, $pass) {
+    public function login_api_check ($loginId, $pass) {
         // パラメータの設定
         $arrayParam = array(
             'id' => $loginId,
@@ -86,13 +90,20 @@ class Login extends CI_Controller {
         // リクエスト送信
         $response = curl_exec($curl);
         $curlinfo = curl_getinfo($curl);
+
+        log_message('debug', 'ここから');
+        log_message('debug', print_r($arrayParam, true));
+
         curl_close($curl);
 
-        var_dump($response);
-
-        // レスポンスチェック
+        // ログイン認証 成否のリターン
         if($curlinfo['http_code'] != 200){
-            throw new Exception('認証システムのAPI実行が失敗しました。 : ' . $curlinfo['http_code']);
+            $this->session->set_flashdata('login_check_error', 'ログイン認証に失敗しました。');
+            return false;
+        } else {
+            $session_data = json_decode(json_encode(simplexml_load_string($response)),true);
+            $this->session->set_userdata($session_data);
+            return true;
         }
     }
 }

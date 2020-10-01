@@ -1,19 +1,26 @@
-<?php
-// ログインページ
-$login_id = array('type'=>'text', 'name'=>'login_id', 'value'=>$form['login_id'], 'maxlength'=>100);
-$pass = array('type'=>'password', 'name'=>'pass', 'value'=>$form['pass'], 'maxlength'=>100);
-?>
+
+<div class='container'>
 
 <?= form_open('login/login'); ?>
 
-    <label for='login_id'>ログインID</label>
-    <?= form_input($login_id); ?><br>
-    <?= form_error('login_id'); ?>
+<legend>ログイン</legend>
 
-    <label for='pass'>パスワード</label>
-    <?= form_input($pass); ?><br>
-    <?= form_error('pass'); ?>
+    <?= $this->session->flashdata('login_check_error'); ?>
 
-    <?= form_submit("login_submit", "ログイン"); ?>
+    <div class="form-group">
+        <label for="login_id">ID</label>
+        <input type="text" id="login_id" name="login_id" value="<?= $form['login_id']; ?>" maxlength="100" class="form-control" aria-describedby="loginIdHelp" placeholder="Enter login id">
+        <?= form_error('login_id'); ?>
+    </div>
+
+    <div class="form-group">
+        <label for="pass">パスワード</label>
+        <input type="password" id="pass" name="pass" value="<?= $form['pass']; ?>" maxlength="100" class="form-control" placeholder="Password">
+        <?= form_error('pass'); ?>
+    </div>
+
+    <button class="btn btn-primary" type="submit">ログイン</button>
 
 <?= form_close(); ?>
+
+</div>
