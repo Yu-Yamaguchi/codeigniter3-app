@@ -22,6 +22,7 @@ class Login extends CI_Controller {
      */
     public function show ($page = 'login')
     {
+        log_message('debug', 'call Login#show()');
         if (! file_exists(APPPATH.'views/pages/'.$page.'.php'))    
         {
             show_404();
@@ -46,6 +47,7 @@ class Login extends CI_Controller {
      */
     public function login ()
     {
+        log_message('debug', 'call Login#login()');
         $data['form'] = $this->input->post();
 
         $login_id = $this->input->post('login_id');
@@ -72,6 +74,7 @@ class Login extends CI_Controller {
      * 認証システムのAPIを実行して認証処理を行います。
      */
     public function login_api_check ($loginId, $pass) {
+        log_message('debug', 'call Login#login_api_check()');
         // パラメータの設定
         $arrayParam = array(
             'id' => $loginId,
@@ -85,14 +88,11 @@ class Login extends CI_Controller {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($arrayParam));
-        curl_setopt($curl, CURLOPT_URL, 'http://192.168.33.10/stubapi/auth?format=xml');
+        curl_setopt($curl, CURLOPT_URL, base_url().'stub_api/auth?format=xml');
 
         // リクエスト送信
         $response = curl_exec($curl);
         $curlinfo = curl_getinfo($curl);
-
-        log_message('debug', 'ここから');
-        log_message('debug', print_r($arrayParam, true));
 
         curl_close($curl);
 

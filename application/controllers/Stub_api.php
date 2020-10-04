@@ -10,15 +10,22 @@ use chriskacerguis\RestServer\RestController;
  *
  * @author    Yu-Yamaguchi
  */
-class StubApi extends RestController {
+class Stub_api extends RestController {
 
     function __construct()
     {
         parent::__construct();
     }
 
+    public function auth_get()
+    {
+        echo '<h1>hello auth_get</h1>';
+    }
+
     public function auth_post()
     {
+        log_message('debug', 'call Stub_api#auth_post()');
+
         // パラメータを変数にセット
         $id = $this->post('id');
         $pass = $this->post('pass');
