@@ -77,10 +77,10 @@ class Gmo extends CI_Controller
         // 決済URL取得API
         $url = 'https://pt01.mul-pay.jp/payment/GetLinkplusUrlPayment.json';
 
-        // GMOの決済で指定するオーダーIDは一意でなければいけない
-        $orderId = 'OR' . date('YmdHis') . rand();
-
         $user = $this->session->userdata('results')['user_info'];
+
+        // GMOの決済で指定するオーダーIDは一意でなければいけない（注文ID先頭4桁を会員IDにした。）
+        $orderId = str_pad($user['user_id'], 4, '0', STR_PAD_LEFT) . 'OR' . date('YmdHis');
 
         // json形式のパラメータを生成するための配列パラメータ定義
         $arr_param = array(
