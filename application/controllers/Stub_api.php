@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 use chriskacerguis\RestServer\RestController;
 
 /**
- * StubApi class
+ * Stub_api class
  * 外部システムとのAPI連携が必要な機能を開発するために、スタブとして開発段階で利用するAPIクラスです。
  * 外部システムのAPIが完成したら不要になります。
  *
@@ -17,15 +17,8 @@ class Stub_api extends RestController {
         parent::__construct();
     }
 
-    public function auth_get()
-    {
-        echo '<h1>hello auth_get</h1>';
-    }
-
     public function auth_post()
     {
-        log_message('debug', 'call Stub_api#auth_post()');
-
         // パラメータを変数にセット
         $id = $this->post('id');
         $pass = $this->post('pass');

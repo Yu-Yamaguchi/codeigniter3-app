@@ -22,7 +22,6 @@ class Login extends CI_Controller {
      */
     public function show ($page = 'login')
     {
-        log_message('debug', 'call Login#show()');
         if (! file_exists(APPPATH.'views/pages/'.$page.'.php'))    
         {
             show_404();
@@ -47,7 +46,6 @@ class Login extends CI_Controller {
      */
     public function login ()
     {
-        log_message('debug', 'call Login#login()');
         $data['form'] = $this->input->post();
 
         $login_id = $this->input->post('login_id');
@@ -74,7 +72,6 @@ class Login extends CI_Controller {
      * 認証システムのAPIを実行して認証処理を行います。
      */
     public function login_api_check ($loginId, $pass) {
-        log_message('debug', 'call Login#login_api_check()');
         // パラメータの設定
         $arrayParam = array(
             'id' => $loginId,

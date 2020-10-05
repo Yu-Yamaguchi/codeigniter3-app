@@ -18,7 +18,6 @@ class Gmo_result_notification extends CI_Controller {
      */
     public function payment_facade ()
     {
-        log_message('debug', 'call Gmo_result_notification#payment_facade()');
         $param = $this->input->post();
 
         // 決済方法により処理分岐
@@ -38,7 +37,6 @@ class Gmo_result_notification extends CI_Controller {
      * 決済方法＝クレジットカード決済の結果を処理します。
      */
     private function result_credit($data) {
-        log_message('debug', 'call Gmo_result_notification#result_credit()');
 
         // クレジットカード決済が正常に完了している場合、決済後会員登録の手続きをする。
         // 決済後会員登録を行うことで、ユーザーがGMOカード会員登録の処理をリンクタイプPlusの画面で
@@ -63,16 +61,12 @@ class Gmo_result_notification extends CI_Controller {
      * 会員登録を行います。
      */
     private function gmo_payment_save_member($member_id) {
-        log_message('debug', 'call Gmo_result_notification#gmo_payment_save_member()');
-
         $param = [
             'SiteID'           => SITE_ID,
             'SitePass'         => SITE_PASS,
             'MemberID'         => $member_id,
             'MemberName'       => 'テスト　太郎'
         ];
-
-        log_message('debug', print_r($param, true));
 
         // リクエストコネクションの設定
         $curl = curl_init();
@@ -87,9 +81,6 @@ class Gmo_result_notification extends CI_Controller {
         $curlinfo = curl_getinfo($curl);
         curl_close($curl);
 
-        log_message('debug', print_r($response, true));
-        log_message('debug', print_r($curlinfo, true));
-        
         // TODO：この辺で処理結果を正しく判別してあげる
 
         return true;
@@ -99,7 +90,6 @@ class Gmo_result_notification extends CI_Controller {
      * 決済後会員登録の処理を行います。
      */
     private function gmo_payment_traded_card($order_id, $member_id) {
-        log_message('debug', 'call Gmo_result_notification#gmo_payment_traded_card()');
 
         $param = [
             'ShopID'           => SHOP_ID,
@@ -113,7 +103,6 @@ class Gmo_result_notification extends CI_Controller {
             'UseSiteMaskLevel' => '1'
         ];
 
-        log_message('debug', print_r($param, true));
 
         // リクエストコネクションの設定
         $curl = curl_init();
@@ -127,9 +116,6 @@ class Gmo_result_notification extends CI_Controller {
         $response = curl_exec($curl);
         $curlinfo = curl_getinfo($curl);
         curl_close($curl);
-
-        log_message('debug', print_r($response, true));
-        log_message('debug', print_r($curlinfo, true));
 
         // TODO：この辺で処理結果を正しく判別してあげる
 
