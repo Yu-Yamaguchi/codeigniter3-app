@@ -54,6 +54,20 @@ class Gmo extends CI_Controller
 
     /**
      * GMO決済画面への遷移情報を生成して案内ページへ遷移します。
+     * 3Dセキュア認証を利用します。
+     */
+    public function secure_payment()
+    {
+        // リンクタイプPlusの決済画面へ遷移するURLをセットして画面表示
+        $data['form']['action'] = $this->gmo_api_model->get_secure_payment_url(true);
+        
+        $this->load->view('templates/header', $data);
+        $this->load->view('pages/payment', $data);
+        $this->load->view('templates/footer', $data);
+    }
+
+    /**
+     * GMO決済画面への遷移情報を生成して案内ページへ遷移します。
      * 会員IDが登録済みの場合のみ会員IDを指定します。
      */
     public function payment_mem()

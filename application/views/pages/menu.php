@@ -23,6 +23,13 @@
     <p class="mb-1">GMOのリンクタイプPlusを利用し、決済画面へ遷移します。</p>
     <small class="text-muted">GMO会員IDを指定して決済画面へ遷移します。<br>会員IDが登録済みの場合のみ会員IDをパラメータにセットして決済画面に遷移するURLを生成します。</small>
   </a>
+  <a href="<?= base_url().'gmo/secure_payment'; ?>" class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">リンクタイプPlusでの決済（3Dセキュア認証を有効化）</h5>
+    </div>
+    <p class="mb-1">GMOのリンクタイプPlusを利用し、決済画面へ遷移します。</p>
+    <small class="text-muted">3Dセキュア認証を利用して決済処理を行います。</small>
+  </a>
 </div>
 
 </div>

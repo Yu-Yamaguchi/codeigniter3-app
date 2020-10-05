@@ -33,13 +33,69 @@ class Gmo_api_model extends CI_Model {
             'transaction'=> array(
                 'OrderID'=> $orderId,
                 'Amount'=> 10000,
-                'Tax'=> 1000
+                'Tax'=> 1000,
+                'PayMethods'=> ['credit']
             ),
             'credit'=> array(
                 'JobCd'=> 'CAPTURE',
                 'Method'=> '1'
             )
         );
+
+        // GMO会員IDのパラメータを設定するか判別してパラメータに追加
+        $arr_member_id = array(
+            'credit'=> array(
+                'MemberID'=> $this->user['user_id']  // GMO会員IDの指定
+            )
+        );
+
+        if ($flg_conf_member) {
+            if ($this->gmo_exists_member($this->user['user_id'])) {
+                $arr_param = array_merge_recursive($arr_param, $arr_member_id);
+            }
+        } else {
+            // $flg_conf_member=falseの場合は無受験に会員IDを指定する。
+            $arr_param = array_merge_recursive($arr_param, $arr_member_id);
+        }
+
+        // 配列→json変換
+        $param = json_encode($arr_param);
+        return $this->get_gmo_linkurl($url, $param);
+    }
+
+    // GMO決済画面へのURLを生成して返却します。
+    public function get_secure_payment_url($flg_conf_member = false)
+    {
+        // 決済URL取得API
+        $url = 'https://pt01.mul-pay.jp/payment/GetLinkplusUrlPayment.json';
+
+        // GMOの決済で指定するオーダーIDは一意でなければいけない（注文ID先頭4桁を会員IDにした。）
+        $orderId = str_pad($this->user['user_id'], 4, '0', STR_PAD_LEFT) . 'OR' . date('YmdHis');
+
+        // json形式のパラメータを生成するための配列パラメータ定義
+        $arr_param = array(
+            'geturlparam'=> array(
+                'ShopID'=> SHOP_ID,
+                'ShopPass'=> SHOP_PASS,
+                'TemplateNo'=> '1'
+            ),
+            'configid'=> 'test01',
+            'transaction'=> array(
+                'OrderID'=> $orderId,
+                'Amount'=> 10000,
+                'Tax'=> 1000,
+                'PayMethods'=> ['credit']
+            ),
+            'credit'=> array(
+                'JobCd'=> 'CAPTURE',
+                'Method'=> '1',
+                'TdFlag'=> '2', // 3Dセキュア認証を契約に従って実施
+                'Tds2Type'=> '1'
+            )
+        );
+        // 3Dセキュア認証テスト用カード
+        // 3DS1.0用　＝　https://faq.gmo-pg.com/service/detail.aspx?id=1681&a=102&isCrawler=1
+        // 3DS2.0用　＝　https://faq.gmo-pg.com/service/detail.aspx?id=2379&a=102&isCrawler=1
 
         // GMO会員IDのパラメータを設定するか判別してパラメータに追加
         $arr_member_id = array(
