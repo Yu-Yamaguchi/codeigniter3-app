@@ -3,7 +3,7 @@
 /**
  * GMO-PGの決済を利用するサンプルのためのControllerです。
  */
-class Gmo extends CI_Controller
+class Gmo extends MY_Controller
 {
     public function __construct()
     {
@@ -19,7 +19,9 @@ class Gmo extends CI_Controller
         $this->gmo_api_model->init($user);
     }
 
-    // メニュー画面を表示します。
+    /**
+     * メニュー画面を表示します。
+     */
     public function menu ($page = 'menu')
     {
         $this->load->view('templates/header');
@@ -27,7 +29,9 @@ class Gmo extends CI_Controller
         $this->load->view('templates/footer');
     }
 
-    // GMOカード会員編集画面への遷移情報を生成して案内ページへ遷移します。
+    /**
+     * GMOカード会員編集画面への遷移情報を生成して案内ページへ遷移します。
+     */
     public function member()
     {
         // リンクタイプPlusの会員カード編集画面へ遷移するURLをセットして画面表示

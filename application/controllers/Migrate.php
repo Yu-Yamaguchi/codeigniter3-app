@@ -1,7 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migrate extends CI_Controller {
+class Migrate extends MY_Controller {
+
+    // 全ての利用者がアクセス可能なControllerとして定義
+    // 一応コンストラクタ内でコマンド実行じゃなければエラーにするようにしている。
+    protected $access = "*";
 
     function __construct()
     {   

@@ -3,7 +3,11 @@
 /**
  * GMOから呼び出される結果通知プログラム用のコントローラです。
  */
-class Gmo_result_notification extends CI_Controller {
+class Gmo_result_notification extends MY_Controller {
+
+    // GMOから呼び出される結果通知プログラムなので誰からでもアクセス可能と定義
+    // グローバルIPなどが分かるなら、そのIPで制限掛けても良いか。
+    protected $access = "*";
 
     public function __construct()
     {

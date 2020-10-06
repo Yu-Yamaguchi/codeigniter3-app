@@ -17,6 +17,10 @@ class Stub_api extends RestController {
         parent::__construct();
     }
 
+    /**
+     * 外部システムのログイン認証API（仮）としての認証機能。
+     * スタブなので後日廃棄予定。
+     */
     public function auth_post()
     {
         // パラメータを変数にセット

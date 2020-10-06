@@ -4,7 +4,10 @@
  * Login class
  * ログイン処理関連のControllerです。
  */
-class Login extends CI_Controller {
+class Login extends MY_Controller {
+
+    // 全ての利用者がアクセス可能なControllerとして定義
+    protected $access = "*";
 
     public function __construct()
     {
@@ -14,19 +17,13 @@ class Login extends CI_Controller {
         $this->load->helper('url_helper');
 
         $this->load->library('form_validation');
-        
     }
 
     /**
      * ログイン画面を表示します。
      */
-    public function show ($page = 'login')
+    public function show ()
     {
-        if (! file_exists(APPPATH.'views/pages/'.$page.'.php'))    
-        {
-            show_404();
-        }
-
         $this->session->sess_destroy();
 
         $data['title'] = "ログイン";
@@ -51,13 +48,21 @@ class Login extends CI_Controller {
         $login_id = $this->input->post('login_id');
         $pass = $this->input->post('pass');
 
-        $this->form_validation->set_rules('login_id', 'ログインID', 'required');
-        $this->form_validation->set_rules('pass', 'パスワード', 'required');
+        $this->form_validation->set_rules('login_id', 'ログインID', 'trim|required');
+        $this->form_validation->set_rules('pass', 'パスワード', 'trim|required');
 
         if ($this->form_validation->run()) {
-            // エラーが無い場合
-            if ($this->login_api_check($login_id, $pass)) {
+            // エラーが無い場合、ログイン認証処理を実行
+            $this->load->model('auth_model', 'auth');
+            if ($this->auth->authenticate($login_id, $pass)) {
+                // ログイン認証OKの情報をセッションに格納
+                $this->session->set_userdata(SESS_LOGGED_IN, true);
+                // ログイン認証が通ったユーザ情報をセッションに格納
+                $this->session->set_userdata($this->auth->get_user());
+                // メニュー画面に遷移（redirect）
                 redirect("gmo/menu"); 
+            } else {
+                $this->session->set_flashdata('login_check_error', 'ログイン認証に失敗しました。');
             }
         }
 
@@ -66,41 +71,5 @@ class Login extends CI_Controller {
         $this->load->view('templates/header', $data);
         $this->load->view('pages/login', $data);
         $this->load->view('templates/footer', $data);
-    }
-
-    /**
-     * 認証システムのAPIを実行して認証処理を行います。
-     */
-    public function login_api_check ($loginId, $pass) {
-        // パラメータの設定
-        $arrayParam = array(
-            'id' => $loginId,
-            'pass' => $pass,
-            'sys_id' => 'hoge'
-        );
-
-        // リクエストコネクションの設定
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($arrayParam));
-        curl_setopt($curl, CURLOPT_URL, base_url().'stub_api/auth?format=xml');
-
-        // リクエスト送信
-        $response = curl_exec($curl);
-        $curlinfo = curl_getinfo($curl);
-
-        curl_close($curl);
-
-        // ログイン認証 成否のリターン
-        if($curlinfo['http_code'] != 200){
-            $this->session->set_flashdata('login_check_error', 'ログイン認証に失敗しました。');
-            return false;
-        } else {
-            $session_data = json_decode(json_encode(simplexml_load_string($response)),true);
-            $this->session->set_userdata($session_data);
-            return true;
-        }
     }
 }
