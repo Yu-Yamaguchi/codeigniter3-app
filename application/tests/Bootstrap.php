@@ -328,7 +328,7 @@ MonkeyPatchManager::init([
 	'debug' => true,
 	'log_file' => '/tmp/monkey-patch-debug.log',
 	// PHP Parser: PREFER_PHP7, PREFER_PHP5, ONLY_PHP7, ONLY_PHP5
-	'php_parser' => 'PREFER_PHP5',
+	'php_parser' => 'PREFER_PHP7',
 	'cache_dir' => TESTPATH . '_ci_phpunit_test/tmp/cache',
 	// Directories to patch source files
 	'include_paths' => [
@@ -355,7 +355,7 @@ MonkeyPatchManager::init([
 	],
 	'exit_exception_classname' => 'CIPHPUnitTestExitException',
 ]);
-*/
+ */
 
 /*
  * -------------------------------------------------------------------

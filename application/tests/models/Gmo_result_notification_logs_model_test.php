@@ -12,7 +12,7 @@ class Gmo_result_notification_logs_model_test extends TestCase
     {
         // テスト用DBを初期化（migration）して利用
         $CI =& get_instance(); 
-        $CI->load->database('phpunit');
+        $CI->load->database();
         $CI->load->library('migration');
         $CI->migration->current();
     }
@@ -34,7 +34,6 @@ class Gmo_result_notification_logs_model_test extends TestCase
     public static function tearDownAfterClass():void
     {
         $CI =& get_instance(); 
-        $CI->load->database('phpunit');
         $CI->load->library('migration');
         $CI->migration->version(0);
     }
