@@ -84,10 +84,13 @@ defined('EXIT_DATABASE')       OR define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
+/***** GMO関連の定義 *****/
 // GMOサイト管理の定義
 defined('SITE_ID')             OR define('SITE_ID', 'tsite99999999'); // GMO SiteID
 defined('SITE_PASS')           OR define('SITE_PASS', 'xxxxxxxx'); // GMO Site Pass
-
 // GMOショップ管理の定義
 defined('SHOP_ID')             OR define('SHOP_ID', 'tshop99999999'); // GMO ShopID
 defined('SHOP_PASS')           OR define('SHOP_PASS', 'xxxxxxxxxx'); // GMO Shop Pass
+
+/***** ログイン認証関連の定義 *****/
+defined('SESS_LOGGED_IN')      OR define('SESS_LOGGED_IN', 'SESS_LOGGED_IN'); // セッションキー：ログイン済みフラグ
