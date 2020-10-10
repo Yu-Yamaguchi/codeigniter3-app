@@ -5,8 +5,15 @@ class Gmo_api_model extends CI_Model {
     /** セッションに格納されたログインユーザ情報 */
     private $user = null;
 
+    /** curl API実行用オブジェクト */
+    public $curl = null;
+
     public function __construct() {
         parent::__construct();
+
+        // curlでのAPI実行用ライブラリのロードとインスタンス変数へのセット
+        $this->load->library('Curl_request');
+        $this->curl = $this->curl_request;
     }
 
     public function init($u) {
@@ -143,55 +150,11 @@ class Gmo_api_model extends CI_Model {
         return $this->get_gmo_linkurl($url, $param);
     }
 
-    // プロトコルタイプのAPIを利用し、キー型のパラメータ指定方法によるAPI実行結果から、URL情報だけを抽出して返却します。
-    private function get_gmo_linkurl($url, $param) {
-        // リクエストコネクションの設定
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8'));
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $param);
-        curl_setopt($curl, CURLOPT_URL, $url);
-
-        // リクエスト送信
-        $response = curl_exec($curl);
-        $curlinfo = curl_getinfo($curl);
-        curl_close($curl);
-
-        $resJson = json_decode($response, true);
-
-        // LinkUrlが取得できなければエラーとして扱う
-        if (!array_key_exists('LinkUrl', $resJson)) {
-            $http_stscd = $curlinfo['http_code'];
-            
-            log_message('error', print_r($response ,true));
-
-            // GMO エラーコードが返却されていればセットする
-            $gmo_errcd = '';
-            parse_str($response, $data);
-            if(array_key_exists('ErrCode', $data)) {
-                $gmo_errcd = $data['ErrCode'];
-            }
-
-            $errmsg = <<< EOD
-            $url . ' API実行が失敗しました。 : '
-            'HTTPステータスコード ： ' . $http_stscd
-            'GMOエラーコード ： ' . $gmo_errcd
-            EOD;
-            
-            throw new Exception($errmsg);
-        }
-
-        // URL取得APIの実行結果からリンク情報を取得し返却
-        return $resJson['LinkUrl'];
-    }
-
     /**
      * 指定されたGMO会員IDがGMOサイトに存在するか確認し、
      * その結果をtrue / falseで返却します。
      */
-    private function gmo_exists_member($member_id) {
+    public function gmo_exists_member($member_id) {
         $param = [
             'SiteID'           => SITE_ID,
             'SitePass'         => SITE_PASS,
@@ -199,17 +162,16 @@ class Gmo_api_model extends CI_Model {
         ];
 
         // リクエストコネクションの設定
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $param);
-        curl_setopt($curl, CURLOPT_URL, 'https://pt01.mul-pay.jp/payment/SearchMember.idPass');
+        $this->curl->init('https://pt01.mul-pay.jp/payment/SearchMember.idPass');
+        $this->curl->set_option(CURLOPT_POST, true);
+        $this->curl->set_option(CURLOPT_RETURNTRANSFER, true);
+        $this->curl->set_option(CURLOPT_CUSTOMREQUEST, 'POST');
+        $this->curl->set_option(CURLOPT_POSTFIELDS, $param);
 
         // リクエスト送信
-        $response = curl_exec($curl);
-        $curlinfo = curl_getinfo($curl);
-        curl_close($curl);
+        $response = $this->curl->execute();
+        $curlinfo = $this->curl->get_info();
+        $this->curl->close();
 
         // 会員IDが見つかればtrue / 正しく見つからない「E01390002」場合はfalseを返却
         $http_stscd = $curlinfo['http_code'];
@@ -238,5 +200,43 @@ class Gmo_api_model extends CI_Model {
             }
         }
         return true;
+    }
+
+    // プロトコルタイプのAPIを利用し、キー型のパラメータ指定方法によるAPI実行結果から、URL情報だけを抽出して返却します。
+    private function get_gmo_linkurl($url, $param) {
+
+        // リクエストコネクションの設定
+        $this->curl->init($url);
+        $this->curl->set_option(CURLOPT_POST, true);
+        $this->curl->set_option(CURLOPT_RETURNTRANSFER, true);
+        $this->curl->set_option(CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8'));
+        $this->curl->set_option(CURLOPT_CUSTOMREQUEST, 'POST');
+        $this->curl->set_option(CURLOPT_POSTFIELDS, $param);
+
+        // リクエスト送信
+        $response = $this->curl->execute();
+        $curlinfo = $this->curl->get_info();
+        $this->curl->close();
+
+        log_message('debug', 'kiteru?');
+        log_message('debug', $response);
+
+        $resJson = json_decode($response, true);
+
+        // LinkUrlが取得できなければエラーとして扱う
+        if (!array_key_exists('LinkUrl', $resJson)) {
+            $http_stscd = $curlinfo['http_code'];
+            
+            $errmsg = <<< EOD
+            $url . ' API実行が失敗しました。 : '
+            'HTTPステータスコード ： ' . $http_stscd
+            'GMO Error : ' . $response
+            EOD;
+
+            throw new Exception($errmsg);
+        }
+
+        // URL取得APIの実行結果からリンク情報を取得し返却
+        return $resJson['LinkUrl'];
     }
 }

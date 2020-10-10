@@ -12,8 +12,6 @@ class Log {
     }
 
     function log_called_function() {
-        log_message('debug', 'call log_called_function()!!');
-
         // ログ出力用の変数セット
         $controller_name = $this->CI->router->fetch_class();
         $method_name = $this->CI->router->fetch_method();

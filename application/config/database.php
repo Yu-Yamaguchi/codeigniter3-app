@@ -70,7 +70,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | The $query_builder variables lets you determine whether or not to load
 | the query builder class.
 */
-$active_group = 'default';
+$active_group = 'phpunit';
 $query_builder = TRUE;
 
 $db['default'] = array(
@@ -79,6 +79,29 @@ $db['default'] = array(
 	'username' => 'yu',
 	'password' => 'yupass',
 	'database' => 'yudb',
+	'dbdriver' => 'mysqli',
+	'dbprefix' => '',
+	'pconnect' => FALSE,
+	'db_debug' => (ENVIRONMENT !== 'production'),
+	'cache_on' => FALSE,
+	'cachedir' => '',
+	'char_set' => 'utf8mb4',
+	'dbcollat' => 'utf8mb4_general_ci',
+	'swap_pre' => '',
+	'encrypt' => FALSE,
+	'compress' => FALSE,
+	'stricton' => FALSE,
+	'failover' => array(),
+	'save_queries' => TRUE
+);
+
+// PHPUnitから利用するデータベース定義
+$db['phpunit'] = array(
+	'dsn'	=> '',
+	'hostname' => 'localhost',
+	'username' => 'yu',
+	'password' => 'yupass',
+	'database' => 'phpunitdb',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
