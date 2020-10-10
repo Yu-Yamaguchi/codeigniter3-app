@@ -20,7 +20,7 @@ class Migration_Add_Gmo_result_notification_logs extends CI_Migration
                 'type'       => 'json'
             ],
             'create_date' => [
-                'type'       => 'date'
+                'type'       => 'datetime'
             ]
         ]);
         $this->dbforge->add_key('id', TRUE);

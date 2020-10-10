@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * GMO-PGへのAPI操作を責務とするモデル
+ */
 class Gmo_api_model extends CI_Model {
 
     /** セッションに格納されたログインユーザ情報 */
@@ -16,11 +19,16 @@ class Gmo_api_model extends CI_Model {
         $this->curl = $this->curl_request;
     }
 
+    /**
+     * API操作に必要なユーザ情報をセットする
+     */
     public function init($u) {
         $this->user = $u;
     }
 
-    // GMO決済画面へのURLを生成して返却します。
+    /**
+     * GMO決済画面へのURLを生成して返却する
+     */
     public function get_payment_url($flg_conf_member = false)
     {
         // 決済URL取得API
@@ -70,7 +78,9 @@ class Gmo_api_model extends CI_Model {
         return $this->get_gmo_linkurl($url, $param);
     }
 
-    // GMO決済画面へのURLを生成して返却します。
+    /**
+     * GMO決済画面へのURLを生成して返却する
+     */
     public function get_secure_payment_url($flg_conf_member = false)
     {
         // 決済URL取得API
@@ -125,7 +135,9 @@ class Gmo_api_model extends CI_Model {
         return $this->get_gmo_linkurl($url, $param);
     }
 
-    // GMOカード会員編集画面への遷移URLを生成して返却します。
+    /**
+     * GMOカード会員編集画面への遷移URLを生成して返却する
+     */
     public function get_member_url()
     {
         // カード編集URL取得API
@@ -152,7 +164,7 @@ class Gmo_api_model extends CI_Model {
 
     /**
      * 指定されたGMO会員IDがGMOサイトに存在するか確認し、
-     * その結果をtrue / falseで返却します。
+     * その結果をtrue / falseで返却する
      */
     public function gmo_exists_member($member_id) {
         $param = [
@@ -202,7 +214,10 @@ class Gmo_api_model extends CI_Model {
         return true;
     }
 
-    // プロトコルタイプのAPIを利用し、キー型のパラメータ指定方法によるAPI実行結果から、URL情報だけを抽出して返却します。
+    /**
+     * プロトコルタイプのAPIを利用し、キー型のパラメータ指定方法によるAPI実行結果から、URL情報だけを抽出して返却する。
+     * API実行に失敗した場合はExceptionをthrow
+     */
     private function get_gmo_linkurl($url, $param) {
 
         // リクエストコネクションの設定

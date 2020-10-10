@@ -10,6 +10,10 @@ interface Http_request
     public function close();
 }
 
+/**
+ * API呼び出しを行うcurlをラッピングする独自クラス。
+ * PHPUnitでMock化するために作成。
+ */
 class Curl_request implements Http_request
 {
     private $handle = null;

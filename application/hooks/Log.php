@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Controllerの処理実行に対してログ出力をhookするクラス。
+ * SpringのAOPみたいなことがしたくて作ってみた。
+ */
 class Log {
 
     protected $CI;
@@ -11,6 +16,9 @@ class Log {
         $this->CI->load->helper('url_helper');
     }
 
+    /**
+     * Controllerのメソッド実行後に実行された処理内容などをログ出力する。
+     */
     function log_called_function() {
         // ログ出力用の変数セット
         $controller_name = $this->CI->router->fetch_class();

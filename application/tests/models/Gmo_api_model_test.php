@@ -5,6 +5,7 @@
  */
 class Gmo_api_model_test extends TestCase
 {
+    // Curl_requestのモックオブジェクト
     private $curl_mock = null;
 
     /**
@@ -28,7 +29,10 @@ class Gmo_api_model_test extends TestCase
                                     ->getMock();
     }
 
-    public function test_GMO決済リンクUrlが正常に取得できること(): void
+    /**
+     * @test
+     */
+    public function GMO決済リンクUrlが正常に取得できること(): void
     {
         // Mock化したAPIのcurl_exec実行結果を定義しreturnで利用
         $this->init_curl_mock();
@@ -58,7 +62,10 @@ class Gmo_api_model_test extends TestCase
         $this->assertGreaterThanOrEqual(10, strpos($url, 'checkout/'));
     }
 
-    public function test_GMO決済リンクUrl取得失敗の詳細がExceptionで伝播されること(): void
+    /**
+     * @test
+     */
+    public function GMO決済リンクUrl取得失敗の詳細がExceptionで伝播されること(): void
     {
         // Mock化したAPIのcurl_exec実行結果を定義しreturnで利用
         $this->init_curl_mock();
@@ -104,6 +111,9 @@ class Gmo_api_model_test extends TestCase
         } 
     }
 
+    /**
+     * @test
+     */
     public function test_GMOカード会員編集Urlが正常に取得できること(): void
     {
         // Mock化したAPIのcurl_exec実行結果を定義しreturnで利用

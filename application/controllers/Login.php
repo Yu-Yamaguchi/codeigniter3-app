@@ -6,7 +6,7 @@
  */
 class Login extends MY_Controller {
 
-    // 全ての利用者がアクセス可能なControllerとして定義
+    /** 全ての利用者がアクセス可能なControllerとして定義 */
     protected $access = "*";
 
     public function __construct()

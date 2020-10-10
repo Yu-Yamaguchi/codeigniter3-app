@@ -5,8 +5,6 @@
  */
 class Gmo_result_notification_logs_model_test extends TestCase
 {
-    private $curl_mock = null;
-
     /**
      * テストクラス内の初回（１回）のみ実行する初期化処理
      */
@@ -41,20 +39,79 @@ class Gmo_result_notification_logs_model_test extends TestCase
         $CI->migration->version(0);
     }
 
-    public function test_ログの登録が正常に完了すること():void
+    /**
+     * @test
+     */
+    public function ログの登録が正常に完了すること():void
     {
-        // public $id;
-        // public $pay_method;
-        // public $parameter;
-        // public $create_date;
-        $this->obj->id = 1;
+        $this->obj->id = 999;
         $this->obj->pay_method = 'credit';
         $this->obj->parameter = '{"aaa": "bbb", "ccc": "ddd"}';
-        $this->obj->create_date = date('Y/m/d h:m:s');
+        $this->obj->create_date = date('Y-m-d h:m:s');
 
         $this->obj->insert_log();
+        $this->assertTrue(true); // ここまできたらOK
+    }
 
-        $this->assertTrue(true);
+    /**
+     * @test
+     * @depends ログの登録が正常に完了すること
+     */
+    public function 登録済みのログが削除できること():void
+    {
+        $this->obj->id = 999;
+        $this->obj->delete_log();
+        $this->assertTrue(true); // ここまできたらOK
+    }
+
+    /**
+     * @test
+     * @depends 登録済みのログが削除できること
+     */
+    public function 登録した順序の降順で取得できること():void
+    {
+        $insert_values = array(
+            array(
+                'id'=> 1,
+                'pay_method'=> 'credit',
+                'parameter'=> '{"aaa": "bbb", "ccc": "ddd"}',
+                'create_date'=> date('Y-m-d h:m:s')
+            ),
+            array(
+                'id'=> 2,
+                'pay_method'=> 'cvs',
+                'parameter'=> '{"eee": "ffff", "gggg": "hhh"}',
+                'create_date'=> date('Y-m-d h:m:s')
+            ),
+            array(
+                'id'=> 3,
+                'pay_method'=> 'paypay',
+                'parameter'=> '{"iii": "jjj", "kkk": "lll"}',
+                'create_date'=> date('Y-m-d h:m:s')
+            )
+        );
+
+        foreach ($insert_values as $value) {
+            $this->obj->id = $value['id'];
+            $this->obj->pay_method = $value['pay_method'];
+            $this->obj->parameter = $value['parameter'];
+            $this->obj->create_date = $value['create_date'];
+
+            $this->obj->insert_log();
+        }
+
+        // ログを取得
+        $logs = $this->obj->get_last_ten_logs();
+
+        // 降順に並び替え
+        $reverse_values = array_reverse($insert_values);
+
+        for ($i = 0; $i < count($reverse_values); $i++) { 
+            $this->assertEquals($reverse_values[$i]['id'], $logs[$i]->id);
+            $this->assertEquals($reverse_values[$i]['pay_method'], $logs[$i]->pay_method);
+            $this->assertEquals($reverse_values[$i]['parameter'], $logs[$i]->parameter);
+            $this->assertEquals($reverse_values[$i]['create_date'], $logs[$i]->create_date);
+        }
     }
 
 }
