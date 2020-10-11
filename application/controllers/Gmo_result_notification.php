@@ -24,6 +24,10 @@ class Gmo_result_notification extends MY_Controller {
     {
         $param = $this->input->post();
 
+        // 結果通知プログラムで受け取った情報をログテーブルに登録
+        $this->load->model('Gmo_result_notification_logs_model', 'log_model');
+        $this->log_model->save_post_param_log($param);
+
         // 決済方法により処理分岐
         switch ($param['PayType']) {
             // 0:クレジット

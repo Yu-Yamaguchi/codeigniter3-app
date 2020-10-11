@@ -48,7 +48,7 @@ class Gmo_result_notification_logs_model_test extends TestCase
         $this->obj->parameter = '{"aaa": "bbb", "ccc": "ddd"}';
         $this->obj->create_date = date('Y-m-d h:m:s');
 
-        $this->obj->insert_log();
+        $this->obj->save();
         $this->assertTrue(true); // ここまできたらOK
     }
 
@@ -59,7 +59,7 @@ class Gmo_result_notification_logs_model_test extends TestCase
     public function 登録済みのログが削除できること():void
     {
         $this->obj->id = 999;
-        $this->obj->delete_log();
+        $this->obj->delete();
         $this->assertTrue(true); // ここまできたらOK
     }
 
@@ -96,7 +96,7 @@ class Gmo_result_notification_logs_model_test extends TestCase
             $this->obj->parameter = $value['parameter'];
             $this->obj->create_date = $value['create_date'];
 
-            $this->obj->insert_log();
+            $this->obj->save();
         }
 
         // ログを取得
