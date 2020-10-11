@@ -114,7 +114,7 @@ class Gmo_api_model_test extends TestCase
     /**
      * @test
      */
-    public function test_GMOカード会員編集Urlが正常に取得できること(): void
+    public function GMOカード会員編集Urlが正常に取得できること(): void
     {
         // Mock化したAPIのcurl_exec実行結果を定義しreturnで利用
         $this->init_curl_mock();
