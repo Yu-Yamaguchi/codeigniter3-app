@@ -2,6 +2,9 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * GMO-PGの結果通知プログラムによって渡されるパラメータ情報などを保持するログテーブル 
+ */
 class Migration_Add_Gmo_result_notification_logs extends CI_Migration
 {
     public function up()
