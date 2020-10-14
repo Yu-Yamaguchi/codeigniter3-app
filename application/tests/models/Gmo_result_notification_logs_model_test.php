@@ -71,19 +71,19 @@ class Gmo_result_notification_logs_model_test extends TestCase
     {
         $insert_values = array(
             array(
-                'id'=> 1,
+                'id'=> 11,
                 'pay_method'=> 'credit',
                 'parameter'=> '{"aaa": "bbb", "ccc": "ddd"}',
                 'create_date'=> date('Y-m-d h:m:s')
             ),
             array(
-                'id'=> 2,
+                'id'=> 12,
                 'pay_method'=> 'cvs',
                 'parameter'=> '{"eee": "ffff", "gggg": "hhh"}',
                 'create_date'=> date('Y-m-d h:m:s')
             ),
             array(
-                'id'=> 3,
+                'id'=> 13,
                 'pay_method'=> 'paypay',
                 'parameter'=> '{"iii": "jjj", "kkk": "lll"}',
                 'create_date'=> date('Y-m-d h:m:s')
@@ -113,4 +113,33 @@ class Gmo_result_notification_logs_model_test extends TestCase
         }
     }
 
+    /**
+     * @test
+     */
+    public function POSTパラメータ配列をそのまま登録できること():void
+    {
+        $post_param = array(
+            'PayType'=>'0',
+            'ShopID'=>'tshop99999999',
+            'ShopPass'=>'**********',
+            'AccessID'=>'3fcf502455bb9511567aeada6c20d6e3',
+            'AccessPass'=>'********************************',
+            'OrderID'=>'12345OR20201011131110',
+            'Status'=>'CAPTURE',
+            'JobCd'=>'CAPTURE',
+            'Amount'=>'10000',
+            'Tax'=>'1000',
+            'Currency'=>'JPN',
+            'Forward'=>'2a99662',
+            'Method'=>'1',
+            'PayTimes'=>'',
+            'TranID'=>'2010111310111111111111811578',
+            'Approve'=>' 019292',
+            'TranDate'=>'20201011131126',
+            'ErrCode'=>'',
+            'ErrInfo'=>''
+        );
+        $this->obj->save_post_param_log($post_param);
+        $this->assertTrue(true); // ここまできたらOK
+    }
 }

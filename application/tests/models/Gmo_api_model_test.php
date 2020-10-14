@@ -65,6 +65,138 @@ class Gmo_api_model_test extends TestCase
     /**
      * @test
      */
+    public function GMO決済リンクUrlが正常に取得できること_会員ID指定(): void
+    {
+        // Mock化したAPIのcurl_exec実行結果を定義しreturnで利用
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'OrderID'=> 'sample-123456789',
+            'LinkUrl'=> 'https://[ドメイン]/v2/plus/tshop11223344/checkout/0258d6e9232978d004bf776c26acb435c7bc9eca33b40798a714a9dde2dfe0c5',
+            'ProcessDate'=> '20200727142656'
+        );
+        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        // MockオブジェクトでCurl_requestへの参照を切り替え
+        $this->obj->curl = $this->curl_mock;
+
+        // Gmo_api_modelクラスのgmo_exists_memberのみをMock化してそれ以外は通常運転としたMockオブジェクト
+        $mock_gmo_api = $this->getMockBuilder('Gmo_api_model')
+                                ->setMethods(['gmo_exists_member'])
+                                ->getMock();
+        
+        // 会員IDが存在しない場合
+        $mock_gmo_api->method('gmo_exists_member')->willReturn(false);
+
+            // Gmo_api_modelを初期化（ログインユーザ情報をセット）
+        $user = array(
+            'user_id'=> 1
+        );
+        $mock_gmo_api->init($user);
+
+        $url = $mock_gmo_api->get_payment_url(true);
+        // 決済URLの接続URLが取得できていればOK
+        $this->assertGreaterThanOrEqual(0, strpos($url, 'https://stg.link.mul-pay.jp/v2/plus'));
+        $this->assertGreaterThanOrEqual(10, strpos($url, 'checkout/'));
+
+        // 会員IDが存在する場合
+        $mock_gmo_api->method('gmo_exists_member')->willReturn(true);
+
+        $url = $mock_gmo_api->get_payment_url(true);
+        // 決済URLの接続URLが取得できていればOK
+        $this->assertGreaterThanOrEqual(0, strpos($url, 'https://stg.link.mul-pay.jp/v2/plus'));
+        $this->assertGreaterThanOrEqual(10, strpos($url, 'checkout/'));
+    }
+
+    /**
+     * @test
+     */
+    public function GMO決済リンクUrl3Dセキュア認証ありが正常に取得できること(): void
+    {
+        // Mock化したAPIのcurl_exec実行結果を定義しreturnで利用
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'OrderID'=> 'sample-123456789',
+            'LinkUrl'=> 'https://[ドメイン]/v2/plus/tshop11223344/checkout/0258d6e9232978d004bf776c26acb435c7bc9eca33b40798a714a9dde2dfe0c5',
+            'ProcessDate'=> '20200727142656'
+        );
+        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        // MockオブジェクトでCurl_requestへの参照を切り替え
+        $this->obj->curl = $this->curl_mock;
+
+        // Gmo_api_modelクラスのgmo_exists_memberのみをMock化してそれ以外は通常運転としたMockオブジェクト
+        $mock_gmo_api = $this->getMockBuilder('Gmo_api_model')
+                                ->setMethods(['gmo_exists_member'])
+                                ->getMock();
+        
+        // 会員IDが存在しない場合
+        $mock_gmo_api->method('gmo_exists_member')->willReturn(false);
+
+            // Gmo_api_modelを初期化（ログインユーザ情報をセット）
+        $user = array(
+            'user_id'=> 1
+        );
+        $mock_gmo_api->init($user);
+
+        $url = $mock_gmo_api->get_secure_payment_url();
+        // 決済URLの接続URLが取得できていればOK
+        $this->assertGreaterThanOrEqual(0, strpos($url, 'https://stg.link.mul-pay.jp/v2/plus'));
+        $this->assertGreaterThanOrEqual(10, strpos($url, 'checkout/'));
+
+        // 会員IDが存在する場合
+        $mock_gmo_api->method('gmo_exists_member')->willReturn(true);
+
+        $url = $mock_gmo_api->get_secure_payment_url(false);
+        // 決済URLの接続URLが取得できていればOK
+        $this->assertGreaterThanOrEqual(0, strpos($url, 'https://stg.link.mul-pay.jp/v2/plus'));
+        $this->assertGreaterThanOrEqual(10, strpos($url, 'checkout/'));
+    }
+
+    /**
+     * @test
+     */
+    public function GMO決済リンクUrl3Dセキュア認証ありが正常に取得できること_会員ID指定(): void
+    {
+        // Mock化したAPIのcurl_exec実行結果を定義しreturnで利用
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'OrderID'=> 'sample-123456789',
+            'LinkUrl'=> 'https://[ドメイン]/v2/plus/tshop11223344/checkout/0258d6e9232978d004bf776c26acb435c7bc9eca33b40798a714a9dde2dfe0c5',
+            'ProcessDate'=> '20200727142656'
+        );
+        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        // MockオブジェクトでCurl_requestへの参照を切り替え
+        $this->obj->curl = $this->curl_mock;
+
+        // Gmo_api_modelクラスのgmo_exists_memberのみをMock化してそれ以外は通常運転としたMockオブジェクト
+        $mock_gmo_api = $this->getMockBuilder('Gmo_api_model')
+                                ->setMethods(['gmo_exists_member'])
+                                ->getMock();
+        
+        // 会員IDが存在しない場合
+        $mock_gmo_api->method('gmo_exists_member')->willReturn(false);
+
+            // Gmo_api_modelを初期化（ログインユーザ情報をセット）
+        $user = array(
+            'user_id'=> 1
+        );
+        $mock_gmo_api->init($user);
+
+        $url = $mock_gmo_api->get_secure_payment_url(true);
+        // 決済URLの接続URLが取得できていればOK
+        $this->assertGreaterThanOrEqual(0, strpos($url, 'https://stg.link.mul-pay.jp/v2/plus'));
+        $this->assertGreaterThanOrEqual(10, strpos($url, 'checkout/'));
+
+        // 会員IDが存在する場合
+        $mock_gmo_api->method('gmo_exists_member')->willReturn(true);
+
+        $url = $mock_gmo_api->get_secure_payment_url(true);
+        // 決済URLの接続URLが取得できていればOK
+        $this->assertGreaterThanOrEqual(0, strpos($url, 'https://stg.link.mul-pay.jp/v2/plus'));
+        $this->assertGreaterThanOrEqual(10, strpos($url, 'checkout/'));
+    }
+
+    /**
+     * @test
+     */
     public function GMO決済リンクUrl取得失敗の詳細がExceptionで伝播されること(): void
     {
         // Mock化したAPIのcurl_exec実行結果を定義しreturnで利用
@@ -146,6 +278,94 @@ class Gmo_api_model_test extends TestCase
         // GMOカード会員編集Urlの接続URLが取得できていればOK
         $this->assertGreaterThanOrEqual(0, strpos($url, 'https://stg.link.mul-pay.jp/v2/plus'));
         $this->assertGreaterThanOrEqual(10, strpos($url, 'member/'));
+    }
+
+    /**
+     * @test
+     */
+    public function GMO会員IDが存在すると判断されること(): void
+    {
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'MemberID'=> '90',
+            'MemberName'=> 'ほげほげ　太郎',
+            'DeleteFlag'=> '0'
+        );
+        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        $ret_info = array(
+            'http_code'=> '200'
+        );
+        $this->curl_mock->method('get_info')->willReturn($ret_info);
+        $this->obj->curl = $this->curl_mock;
+        $result = $this->obj->gmo_exists_member(90);
+        $this->assertEquals(true, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function GMO会員IDが存在しないと判断されること(): void
+    {
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'ErrCode'=> 'E01',
+            'ErrInfo'=> 'E01390002'
+        );
+        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        $ret_info = array(
+            'http_code'=> '200'
+        );
+        $this->curl_mock->method('get_info')->willReturn($ret_info);
+        $this->obj->curl = $this->curl_mock;
+        $result = $this->obj->gmo_exists_member(99);
+        $this->assertEquals(false, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function GMO会員ID存在チェックでHTTPテータスエラー(): void
+    {
+        // Exceptionが発生することを期待する
+        $this->expectException(Exception::class);
+        // SearchMember.idPassのAPI呼び出しで失敗したメッセージがExceptionのメッセージに含まれることを期待する
+        // @expectedExceptionMessageRegExp が使えなくなって、このメソッドになったんですね。
+        $this->expectExceptionMessageMatches('/SearchMember.idPass API実行が失敗しました。/');
+
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'ErrCode'=> 'E01',
+            'ErrInfo'=> 'E01390010'
+        );
+        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        $ret_info = array(
+            'http_code'=> '400'
+        );
+        $this->curl_mock->method('get_info')->willReturn($ret_info);
+        $this->obj->curl = $this->curl_mock;
+        $result = $this->obj->gmo_exists_member(99);
+    }
+
+    /**
+     * @test
+     */
+    public function GMO会員ID存在チェックでHTTPテータス200なのに想定外のErrInfo(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageMatches('/SearchMember.idPassのErrInfoで予期せぬリターン/');
+
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'ErrCode'=> 'E01',
+            'ErrInfo'=> 'E01390010'
+        );
+        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        $ret_info = array(
+            'http_code'=> '200'
+        );
+        $this->curl_mock->method('get_info')->willReturn($ret_info);
+        $this->obj->curl = $this->curl_mock;
+        $result = $this->obj->gmo_exists_member(99);
     }
 
 }

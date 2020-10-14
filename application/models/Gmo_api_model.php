@@ -187,7 +187,7 @@ class Gmo_api_model extends CI_Model {
 
         // 会員IDが見つかればtrue / 正しく見つからない「E01390002」場合はfalseを返却
         $http_stscd = $curlinfo['http_code'];
-        parse_str( $response, $data );
+        $data = json_decode($response, true);
 
         if($http_stscd != 200) {
             $gmo_errcd = '';
@@ -195,7 +195,7 @@ class Gmo_api_model extends CI_Model {
                 $gmo_errcd = $data['ErrCode'];
             }
             $errmsg = <<< EOD
-            $url . 'SearchMember.idPass API実行が失敗しました。 : '
+            'SearchMember.idPass API実行が失敗しました。 : '
             'HTTPステータスコード ： ' . $http_stscd
             'GMOエラーコード ： ' . $gmo_errcd
             EOD;
@@ -211,6 +211,7 @@ class Gmo_api_model extends CI_Model {
                 throw new Exception('SearchMember.idPassのErrInfoで予期せぬリターン：' . $err_info);
             }
         }
+
         return true;
     }
 
@@ -233,9 +234,6 @@ class Gmo_api_model extends CI_Model {
         $curlinfo = $this->curl->get_info();
         $this->curl->close();
 
-        log_message('debug', 'kiteru?');
-        log_message('debug', $response);
-
         $resJson = json_decode($response, true);
 
         // LinkUrlが取得できなければエラーとして扱う
@@ -253,5 +251,110 @@ class Gmo_api_model extends CI_Model {
 
         // URL取得APIの実行結果からリンク情報を取得し返却
         return $resJson['LinkUrl'];
+    }
+
+    /**
+     * 結果通知プログラムの内容に応じて処理を行う。
+     * @param $param 結果通知プログラムでPOSTされた（受け取った）パラメータ配列
+     */
+    public function result_notification($param) {
+        // 決済方法により処理分岐
+        switch ($param['PayType']) {
+            // 0:クレジット
+            case '0':
+                $this->result_credit($param);
+                break;
+            // その他（契約している決済方法に応じて分岐）
+            default:
+                // ....その他の処理
+                break;
+        }
+    }
+
+
+    /**
+     * 決済方法＝クレジットカード決済の結果を処理します。
+     */
+    private function result_credit($data) {
+        // クレジットカード決済が正常に完了している場合、決済後会員登録の手続きをする。
+        // 決済後会員登録を行うことで、ユーザーがGMOカード会員登録の処理をリンクタイプPlusの画面で
+        // 意図的に行う必要がない。（もちろん勝手に登録しちゃまずいと思うので、なんらかの方法で
+        // ユーザーに確認して同意しておく必要はあると思います。）
+        if ($data['Status'] == 'CAPTURE' or $data['Status'] == 'SALES') {
+            $order_id = $data['OrderID'];
+
+            // 注文IDの先頭4桁を会員IDにしているのでそこから抽出
+            // 本来はDBに登録されている注文IDから会員を識別するなどちゃんとした処理は必要ですよね。
+            $member_id = intval(substr($order_id, 1, 4));
+
+            log_message('debug', print_r($data, true));
+            log_message('debug', 'order_id:'.$order_id.'/member_id:'.$member_id);
+
+            $this->gmo_payment_save_member($member_id);
+            $this->gmo_payment_traded_card($order_id, $member_id);
+        }
+    }
+
+     /**
+     * 会員登録を行います。
+     */
+    private function gmo_payment_save_member($member_id) {
+        $param = [
+            'SiteID'           => SITE_ID,
+            'SitePass'         => SITE_PASS,
+            'MemberID'         => $member_id,
+            'MemberName'       => 'テスト　太郎'
+        ];
+
+        // リクエストコネクションの設定
+        $curl = $this->curl->init('https://pt01.mul-pay.jp/payment/SaveMember.idPass');
+        $this->curl->set_option(CURLOPT_POST, true);
+        $this->curl->set_option(CURLOPT_RETURNTRANSFER, true);
+        $this->curl->set_option(CURLOPT_CUSTOMREQUEST, 'POST');
+        $this->curl->set_option(CURLOPT_POSTFIELDS, $param);
+
+        // リクエスト送信
+        $response = $this->curl->execute();
+        $curlinfo = $this->curl->get_info();
+        $this->curl->close();
+
+        // TODO：この辺で処理結果を正しく判別してあげる
+
+        return true;
+    }
+
+    /**
+     * 決済後会員登録の処理を行います。
+     */
+    private function gmo_payment_traded_card($order_id, $member_id) {
+
+        $param = [
+            'ShopID'           => SHOP_ID,
+            'ShopPass'         => SHOP_PASS,
+            'OrderID'          => $order_id,
+            'SiteID'           => SITE_ID,
+            'SitePass'         => SITE_PASS,
+            'MemberID'         => $member_id,
+            'SeqMode'          => '0',
+            'DefaultFlag'      => '1', // 洗替・継続課金フラグは、継続課金は利用しないが、洗替の機能は利用する。という場合にも`1`をセットする。
+            'UseSiteMaskLevel' => '1'
+        ];
+
+
+        // リクエストコネクションの設定
+        $curl = $this->curl->init('https://pt01.mul-pay.jp/payment/TradedCard.idPass');
+        $this->curl->set_option(CURLOPT_POST, true);
+        $this->curl->set_option(CURLOPT_RETURNTRANSFER, true);
+        $this->curl->set_option(CURLOPT_CUSTOMREQUEST, 'POST');
+        $this->curl->set_option(CURLOPT_POSTFIELDS, $param);
+
+        // リクエスト送信
+        $response = $this->curl->execute();
+        $curlinfo = $this->curl->get_info();
+        $this->curl->close();
+
+        // TODO：この辺で処理結果を正しく判別してあげる
+
+        return true;
     }
 }
