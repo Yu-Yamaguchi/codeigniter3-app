@@ -24,8 +24,6 @@ class Login extends MY_Controller {
      */
     public function show ()
     {
-        $this->session->sess_destroy();
-
         $data['title'] = "ログイン";
 
         $data['form']['login_id'] = '';

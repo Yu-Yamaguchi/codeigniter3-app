@@ -187,7 +187,7 @@ class Gmo_api_model extends CI_Model {
 
         // 会員IDが見つかればtrue / 正しく見つからない「E01390002」場合はfalseを返却
         $http_stscd = $curlinfo['http_code'];
-        $data = json_decode($response, true);
+        parse_str($response, $data);
 
         if($http_stscd != 200) {
             $gmo_errcd = '';
@@ -318,7 +318,27 @@ class Gmo_api_model extends CI_Model {
         $curlinfo = $this->curl->get_info();
         $this->curl->close();
 
-        // TODO：この辺で処理結果を正しく判別してあげる
+        // 会員登録の結果を取得
+        $http_stscd = $curlinfo['http_code'];
+        parse_str($response, $data);
+
+        if($http_stscd != 200) {
+            $gmo_errcd = '';
+            if (array_key_exists('ErrCode', $data)) {
+                $gmo_errcd = $data['ErrCode'];
+            }
+            $errmsg = <<< EOD
+            'SaveMember.idPass API実行が失敗しました。 : '
+            'HTTPステータスコード ： ' . $http_stscd
+            'GMOエラーコード ： ' . $gmo_errcd
+            EOD;
+            throw new Exception($errmsg);
+        }
+
+        $err_info = '';
+        if (array_key_exists('ErrInfo', $data)) {
+            throw new Exception('SaveMember.idPassのErrInfoで予期せぬリターン：' . $err_info);
+        }
 
         return true;
     }

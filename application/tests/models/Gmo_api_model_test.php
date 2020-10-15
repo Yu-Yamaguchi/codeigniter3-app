@@ -291,7 +291,7 @@ class Gmo_api_model_test extends TestCase
             'MemberName'=> 'ほげほげ　太郎',
             'DeleteFlag'=> '0'
         );
-        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        $this->curl_mock->method('execute')->willReturn(http_build_query($ret_exec));
         $ret_info = array(
             'http_code'=> '200'
         );
@@ -311,7 +311,7 @@ class Gmo_api_model_test extends TestCase
             'ErrCode'=> 'E01',
             'ErrInfo'=> 'E01390002'
         );
-        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        $this->curl_mock->method('execute')->willReturn(http_build_query($ret_exec));
         $ret_info = array(
             'http_code'=> '200'
         );
@@ -337,7 +337,7 @@ class Gmo_api_model_test extends TestCase
             'ErrCode'=> 'E01',
             'ErrInfo'=> 'E01390010'
         );
-        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        $this->curl_mock->method('execute')->willReturn(http_build_query($ret_exec));
         $ret_info = array(
             'http_code'=> '400'
         );
@@ -359,13 +359,87 @@ class Gmo_api_model_test extends TestCase
             'ErrCode'=> 'E01',
             'ErrInfo'=> 'E01390010'
         );
-        $this->curl_mock->method('execute')->willReturn(json_encode($ret_exec));
+        $this->curl_mock->method('execute')->willReturn(http_build_query($ret_exec));
         $ret_info = array(
             'http_code'=> '200'
         );
         $this->curl_mock->method('get_info')->willReturn($ret_info);
         $this->obj->curl = $this->curl_mock;
         $result = $this->obj->gmo_exists_member(99);
+    }
+
+    /**
+     * @test
+     */
+    public function GMO会員登録が正常に完了すること(): void
+    {
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'MemberID'=> '91'
+        );
+        $this->curl_mock->method('execute')->willReturn(http_build_query($ret_exec));
+        $ret_info = array(
+            'http_code'=> '200'
+        );
+        $this->curl_mock->method('get_info')->willReturn($ret_info);
+        $this->obj->curl = $this->curl_mock;
+
+        // Gmo_api_modelのprivateメソッドをUnitTestするためReflectionの機能で実行する。
+        $this->CI->load->helper('unit_test');
+        call_reflection_function($this->obj, 'gmo_payment_save_member', [91]);
+        $this->assertTrue(true); // ここまできたらOK
+    }
+
+    /**
+     * @test
+     */
+    public function GMO会員登録_HTTPステータスでエラー(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageMatches('/SaveMember.idPass API実行が失敗しました。/');
+
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'ErrCode'=> 'E01',
+            'ErrInfo'=> 'E01390010'
+        );
+        $this->curl_mock->method('execute')->willReturn(http_build_query($ret_exec));
+        $ret_info = array(
+            'http_code'=> '400'
+        );
+        $this->curl_mock->method('get_info')->willReturn($ret_info);
+        $this->obj->curl = $this->curl_mock;
+
+        // Gmo_api_modelのprivateメソッドをUnitTestするためReflectionの機能で実行する。
+        $this->CI->load->helper('unit_test');
+        call_reflection_function($this->obj, 'gmo_payment_save_member', [92]);
+        $this->assertTrue(true); // ここまできたらOK
+    }
+
+    /**
+     * @test
+     */
+    public function GMO会員登録_HTTPステータス200だけどErrInfoありでエラー(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageMatches('/SaveMember.idPassのErrInfoで予期せぬリターン/');
+
+        $this->init_curl_mock();
+        $ret_exec = array(
+            'ErrCode'=> 'E01',
+            'ErrInfo'=> 'E01390010'
+        );
+        $this->curl_mock->method('execute')->willReturn(http_build_query($ret_exec));
+        $ret_info = array(
+            'http_code'=> '200'
+        );
+        $this->curl_mock->method('get_info')->willReturn($ret_info);
+        $this->obj->curl = $this->curl_mock;
+
+        // Gmo_api_modelのprivateメソッドをUnitTestするためReflectionの機能で実行する。
+        $this->CI->load->helper('unit_test');
+        call_reflection_function($this->obj, 'gmo_payment_save_member', [92]);
+        $this->assertTrue(true); // ここまできたらOK
     }
 
 }
