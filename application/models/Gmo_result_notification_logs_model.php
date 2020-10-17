@@ -25,6 +25,7 @@ class Gmo_result_notification_logs_model extends CI_Model {
      * 受け取ったPOSTパラメータ情報から登録データをセットし登録
      */
     public function save_post_param_log($post_param) {
+        log_message('debug', '******* call save_post_param_log');
         $this->pay_method = $post_param['PayType'];
         $this->parameter = json_encode($post_param);
         $this->create_date = date('Y-m-d h:m:s');

@@ -15,6 +15,9 @@ class Gmo_result_notification extends MY_Controller {
         $this->load->helper('html');
         $this->load->helper('form');
         $this->load->helper('url_helper');
+
+        $this->load->model('Gmo_result_notification_logs_model', 'log_model');
+        $this->load->model('gmo_api_model', 'api_model');
     }
 
     /**
@@ -24,12 +27,13 @@ class Gmo_result_notification extends MY_Controller {
     {
         $param = $this->input->post();
 
+        log_message('debug', '******* call payment_facade');
+        log_message('debug', print_r($param, true));
+
         // 結果通知プログラムで受け取った情報をログテーブルに登録
-        $this->load->model('Gmo_result_notification_logs_model', 'log_model');
         $this->log_model->save_post_param_log($param);
 
         // 決済方法により適切な処理を行う
-        $this->load->model('gmo_api_model');
-        $this->gmo_api_model->result_notification($param);
+        $this->api_model->result_notification($param);
     }
 }

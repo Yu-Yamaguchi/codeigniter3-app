@@ -258,6 +258,7 @@ class Gmo_api_model extends CI_Model {
      * @param $param 結果通知プログラムでPOSTされた（受け取った）パラメータ配列
      */
     public function result_notification($param) {
+        log_message('debug', '******* call result_notification');
         // 決済方法により処理分岐
         switch ($param['PayType']) {
             // 0:クレジット

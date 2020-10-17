@@ -65,7 +65,6 @@ class Login extends MY_Controller {
         }
 
         // エラーの場合
-        $data['title'] = "ログイン";
         $this->load->view('templates/header', $data);
         $this->load->view('pages/login', $data);
         $this->load->view('templates/footer', $data);
